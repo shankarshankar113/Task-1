@@ -1,0 +1,73 @@
+Here's a step-by-step guide on designing a Finite State Machine (FSM) using Verilog, writing a testbench, and simulating the FSM behavior:
+
+Designing the FSM in Verilog
+Let's design a simple FSM that implements a 2-bit counter. The FSM has four states: S0, S1, S2, and S3.
+
+```
+module counter_fsm(
+    input clk,
+    input rst,
+    output reg [1:0] state
+);
+
+parameter S0 = 2'b00;
+parameter S1 = 2'b01;
+parameter S2 = 2'b10;
+parameter S3 = 2'b11;
+
+reg [1:0] next_state;
+
+always @(posedge clk or posedge rst)
+begin
+    if (rst)
+        state <= S0;
+    else
+        state <= next_state;
+end
+
+always @(*)
+begin
+    case (state)
+        S0: next_state = S1;
+        S1: next_state = S2;
+        S2: next_state = S3;
+        S3: next_state = S0;
+        default: next_state = S0;
+    endcase
+end
+
+endmodule
+```
+
+Writing a Testbench
+Now, let's write a testbench to test the FSM's behavior.
+
+```
+module testbench;
+reg clk;
+reg rst;
+wire [1:0] state;
+
+counter_fsm uut (
+    .clk(clk),
+    .rst(rst),
+    .state(state)
+);
+
+initial
+begin
+    clk = 0;
+    rst = 1;
+    #10 rst = 0;
+end
+
+always #5 clk = ~clk;
+
+initial
+begin
+    $monitor("State = %b", state);
+    #100 $finish;
+end
+
+endmodule
+```
